@@ -1,0 +1,29 @@
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: rabbitmq
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    # healthcheck:
+    #   test: ["CMD", "curl", "-f", "http://localhost:15672"]
+    #   interval: 30s
+    #   timeout: 10s
+    #   retries: 5
+  # wait_for_rabbitmq:
+  #   image: containous/wait-for
+  #   depends_on:
+  #     - rabbitmq
+  #   command: rabbitmq:5672 -timeout=60
+
+  python_app:
+    build:
+      context: .
+    container_name: python_app
+    depends_on:
+      - rabbitmq
+        # condition: service_healthy
+    restart: on-failure
+    # environment:
+    #   - PYTHONUNBUFFERED=1
+    command: python hometest_message_queue.py
